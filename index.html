@@ -3,20 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pemarkahan Kursus (Online)</title>
+    <title>Sistem Pemarkahan (Update Mode)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* UI & LOADER */
         .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); z-index:999; display:none; justify-content:center; align-items:center; color:white; flex-direction:column; backdrop-filter: blur(4px); }
         .input-error { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; transition: all 0.3s; }
-        
-        /* CETAKAN (PRINT) */
         @media print {
             @page { margin: 0.5cm; size: A4; }
             body { background: white !important; font-size: 11px; -webkit-print-color-adjust: exact; }
             .no-print { display: none !important; }
             input { border: none !important; text-align: right; font-weight: bold; padding: 0; background: transparent; }
-            /* Sembunyikan arrow pada input number */
             input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
             table, th, td { border: 1px solid black !important; border-collapse: collapse; }
         }
@@ -26,29 +22,26 @@
 
     <div id="loader" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
-        <p id="loader_text" class="text-xl font-bold tracking-wider">Sedang Menghubungi Database...</p>
+        <p id="loader_text" class="text-xl font-bold tracking-wider">Menyemak Data...</p>
     </div>
 
     <div class="max-w-5xl mx-auto p-4 md:p-8 bg-white my-4 md:rounded-xl md:shadow-xl relative">
-        
         <header class="text-center border-b-2 border-gray-800 pb-4 mb-6">
-            <h1 class="text-2xl font-bold uppercase tracking-wide">Sistem Pemarkahan MPU2071 PENGURUSAN KOKURIKULUM PDPP PEPERIKSAAN FEB 2026</h1>
-            <p class="text-sm text-gray-600">Disambungkan ke Google Sheets</p>
+            <h1 class="text-2xl font-bold uppercase tracking-wide">Sistem Pemarkahan MPU2071 PENGURUKAN KOKURIKULUM PDPP PEPERIKSAAN FEB 2026</h1>
+            <p class="text-sm text-gray-600">Mode Kemaskini Automatik (Tiada Pendua)</p>
         </header>
 
         <div class="no-print mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <h3 class="font-bold text-blue-900 text-sm flex items-center gap-2">
-                        ☁️ Data Pelajar (Online)
-                    </h3>
-                    <p class="text-xs text-blue-700 mt-1" id="status_msg">Sila tekan butang Muat Turun untuk bermula.</p>
+                    <h3 class="font-bold text-blue-900 text-sm">☁️ Pangkalan Data Pelajar</h3>
+                    <p class="text-xs text-blue-700 mt-1" id="status_msg">Tekan butang Muat Turun untuk akses senarai terkini.</p>
                 </div>
                 <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="fetchStudents()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-bold shadow transition flex items-center gap-2">
-                        🔄 1. Muat Naik Nama
+                    <button onclick="fetchStudents()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-bold shadow flex items-center gap-2">
+                        🔄 Muat Turun Nama
                     </button>
-                    <select id="student_select" class="w-full md:w-64 border border-blue-300 text-sm rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white font-semibold text-gray-700">
+                    <select id="student_select" class="w-full md:w-64 border border-blue-300 text-sm rounded px-3 py-2 outline-none font-semibold">
                         <option value="">-- Pilih Pelajar --</option>
                     </select>
                 </div>
@@ -56,163 +49,91 @@
         </div>
 
         <section class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm bg-gray-50 p-6 rounded-lg border border-gray-200 print:bg-white print:border-none print:p-0">
-            <div>
-                <label class="block font-bold text-xs uppercase text-gray-500 mb-1">Nama Pelajar</label>
-                <input type="text" id="std_name" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none uppercase" readonly placeholder="-">
-            </div>
-            <div>
-                <label class="block font-bold text-xs uppercase text-gray-500 mb-1">No. Kad Pengenalan</label>
-                <input type="text" id="std_ic" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none" readonly placeholder="-">
-            </div>
-            <div>
-                <label class="block font-bold text-xs uppercase text-gray-500 mb-1">Kelas & Kumpulan</label>
-                <input type="text" id="std_class" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none" placeholder="-">
-            </div>
-            <div>
-                <label class="block font-bold text-xs uppercase text-gray-500 mb-1">Nama Pensyarah</label>
-                <input type="text" id="lecturer_name" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 focus:border-blue-500 outline-none" placeholder="Masukkan nama pensyarah...">
-            </div>
+            <div><label class="block font-bold text-xs uppercase text-gray-500 mb-1">Nama Pelajar</label><input type="text" id="std_name" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 outline-none uppercase" readonly placeholder="-"></div>
+            <div><label class="block font-bold text-xs uppercase text-gray-500 mb-1">No. Kad Pengenalan</label><input type="text" id="std_ic" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 outline-none" readonly placeholder="-"></div>
+            <div><label class="block font-bold text-xs uppercase text-gray-500 mb-1">Kelas & Kumpulan</label><input type="text" id="std_class" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 outline-none" placeholder="-"></div>
+            <div><label class="block font-bold text-xs uppercase text-gray-500 mb-1">Nama Pensyarah</label><input type="text" id="lecturer_name" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 outline-none" placeholder="Masukkan Nama Pensyarah..."></div>
         </section>
 
         <table class="w-full text-sm border-collapse border border-gray-300 shadow-sm rounded overflow-hidden">
             <thead class="bg-gray-800 text-white print:bg-gray-300 print:text-black">
-                <tr>
-                    <th class="border p-3 text-left w-2/3">Komponen Penilaian</th>
-                    <th class="border p-3 text-center w-1/6">Markah Penuh</th>
-                    <th class="border p-3 text-center w-1/6">Skor</th>
-                </tr>
+                <tr><th class="border p-3 text-left w-2/3">Komponen Penilaian</th><th class="border p-3 text-center w-1/6">Markah Penuh</th><th class="border p-3 text-center w-1/6">Skor</th></tr>
             </thead>
             <tbody class="bg-white">
                 <tr class="bg-purple-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-purple-900 border-b-2 border-purple-200">HPK1: Ujian Bertulis (30%)</td></tr>
                 <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Markah Ujian</td><td class="border p-3 text-center font-bold text-gray-500">30</td><td class="border p-3"><input type="number" id="hpk1_score" max="30" class="w-full text-center font-bold text-lg outline-none input-box text-purple-700" oninput="validate(this)" placeholder="0"></td></tr>
 
-                <tr class="bg-green-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-green-900 border-b-2 border-green-200">HPK2: Pembentangan & Kertas Kerja (40%)</td></tr>
-                
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">A. HP5: KERTAS KERJA (30%)</td></tr>
-                <tbody id="hp5_rows"></tbody> <tr class="font-bold bg-green-50 border-t-2 border-green-200"><td class="border p-2 text-right text-green-800">JUMLAH HP5</td><td class="border p-2 text-center text-gray-500">30</td><td class="border p-2 text-center text-xl text-green-700" id="hp5_total">0</td></tr>
+                <tr class="bg-green-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-green-900 border-b-2 border-green-200">HPK2: Pembentangan (40%)</td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP5: KERTAS KERJA (30%)</td></tr>
+                <tbody id="hp5_rows"></tbody>
+                <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP5</td><td class="border p-2 text-center text-gray-500">30</td><td class="border p-2 text-center text-xl text-green-700" id="hp5_total">0</td></tr>
 
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">B. HP6: DINAMIKA KUMPULAN (10%)</td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-2 pl-6">Gaya Bahasa & Penyampaian</td><td class="border p-2 text-center font-bold text-gray-400">3</td><td class="border p-2"><input type="number" id="hp6_1" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-2 pl-6">Struktur & Kejelasan Idea</td><td class="border p-2 text-center font-bold text-gray-400">4</td><td class="border p-2"><input type="number" id="hp6_2" max="4" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-2 pl-6">Kerjasama Kumpulan</td><td class="border p-2 text-center font-bold text-gray-400">3</td><td class="border p-2"><input type="number" id="hp6_3" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>
-                <tr class="font-bold bg-green-50 border-t-2 border-green-200"><td class="border p-2 text-right text-green-800">JUMLAH HP6</td><td class="border p-2 text-center text-gray-500">10</td><td class="border p-2 text-center text-xl text-green-700" id="hp6_total">0</td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP6: DINAMIKA (10%)</td></tr>
+                <tr><td class="border p-2 pl-6">Gaya Bahasa</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" id="hp6_1" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">Struktur Idea</td><td class="border p-2 text-center">4</td><td class="border p-2"><input type="number" id="hp6_2" max="4" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">Kerjasama</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" id="hp6_3" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP6</td><td class="border p-2 text-center text-gray-500">10</td><td class="border p-2 text-center text-xl text-green-700" id="hp6_total">0</td></tr>
 
-                <tr class="bg-orange-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-orange-900 border-b-2 border-orange-200">HPK3: Projek Akhir (30%)</td></tr>
-                
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">A. HP8: KEMAHIRAN PRAKTIKAL (20%)</td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-2 pl-6">HP8.1 Perancangan & Pelaksanaan</td><td class="border p-2 text-center font-bold text-gray-400">7</td><td class="border p-2"><input type="number" id="hp8_1" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-2 pl-6">HP8.2 Kepimpinan & Tugas</td><td class="border p-2 text-center font-bold text-gray-400">7</td><td class="border p-2"><input type="number" id="hp8_2" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-2 pl-6">HP8.3 Dokumentasi & Bukti</td><td class="border p-2 text-center font-bold text-gray-400">6</td><td class="border p-2"><input type="number" id="hp8_3" max="6" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>
-                <tr class="font-bold bg-orange-50 border-t-2 border-orange-200"><td class="border p-2 text-right text-orange-800">JUMLAH HP8</td><td class="border p-2 text-center text-gray-500">20</td><td class="border p-2 text-center text-xl text-orange-700" id="hp8_total">0</td></tr>
+                <tr class="bg-orange-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-orange-900 border-b-2 border-orange-200">HPK3: Projek (30%)</td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP8: PRAKTIKAL (20%)</td></tr>
+                <tr><td class="border p-2 pl-6">HP8.1 Perancangan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" id="hp8_1" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">HP8.2 Kepimpinan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" id="hp8_2" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">HP8.3 Dokumentasi</td><td class="border p-2 text-center">6</td><td class="border p-2"><input type="number" id="hp8_3" max="6" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr class="font-bold bg-orange-50"><td class="border p-2 text-right text-orange-800">JUMLAH HP8</td><td class="border p-2 text-center text-gray-500">20</td><td class="border p-2 text-center text-xl text-orange-700" id="hp8_total">0</td></tr>
 
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">B. HP11: ETIKA & PROFESIONALISME (10%)</td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Nilai Etika & Sikap Proaktif</td><td class="border p-3 text-center font-bold text-gray-400">10</td><td class="border p-3"><input type="number" id="hp11_score" max="10" class="w-full text-center font-bold text-lg outline-none input-box text-orange-700" oninput="validate(this)" placeholder="0"></td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP11: ETIKA (10%)</td></tr>
+                <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Nilai Etika & Sikap</td><td class="border p-3 text-center font-bold text-gray-400">10</td><td class="border p-3"><input type="number" id="hp11_score" max="10" class="w-full text-center font-bold text-lg outline-none input-box text-orange-700" oninput="validate(this)" placeholder="0"></td></tr>
             </tbody>
             <tfoot class="bg-gray-900 text-white print:bg-white print:text-black border-t-4 border-black">
-                <tr>
-                    <td class="border p-4 text-right font-bold uppercase text-lg">Jumlah Markah Keseluruhan</td>
-                    <td class="border p-4 text-center font-bold text-gray-400">100%</td>
-                    <td class="border p-4 text-center font-bold text-3xl" id="grand_total">0.0</td>
-                </tr>
-                <tr>
-                    <td class="border p-4 text-right font-bold uppercase text-lg">Gred Akhir</td>
-                    <td colspan="2" class="border p-4 text-center font-bold text-4xl" id="final_grade">-</td>
-                </tr>
+                <tr><td class="border p-4 text-right font-bold uppercase text-lg">Jumlah Besar</td><td class="border p-4 text-center font-bold text-gray-400">100%</td><td class="border p-4 text-center font-bold text-3xl" id="grand_total">0.0</td></tr>
+                <tr><td class="border p-4 text-right font-bold uppercase text-lg">Gred Akhir</td><td colspan="2" class="border p-4 text-center font-bold text-4xl" id="final_grade">-</td></tr>
             </tfoot>
         </table>
 
-        <div class="hidden print:flex mt-16 justify-around items-end">
-            <div class="text-center w-1/3">
-                <p class="border-b border-black mb-2 pb-8"></p>
-                <p class="font-bold text-sm uppercase">Tandatangan Pelajar</p>
-                <p class="text-xs mt-1">Tarikh: ..............................</p>
-            </div>
-            <div class="text-center w-1/3">
-                <p class="border-b border-black mb-2 pb-8"></p>
-                <p class="font-bold text-sm uppercase">Tandatangan Penilai</p>
-                <p class="text-xs mt-1">Tarikh: ..............................</p>
-            </div>
+         <div class="hidden print:flex mt-16 justify-around items-end">
+            <div class="text-center w-1/3"><p class="border-b border-black mb-2 pb-8"></p><p class="font-bold text-sm uppercase">Tandatangan Pelajar</p><p class="text-xs mt-1">Tarikh: ..............................</p></div>
+            <div class="text-center w-1/3"><p class="border-b border-black mb-2 pb-8"></p><p class="font-bold text-sm uppercase">Tandatangan Penilai</p><p class="text-xs mt-1">Tarikh: ..............................</p></div>
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 w-full bg-white border-t p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] flex flex-col md:flex-row justify-center items-center gap-4 no-print z-50">
-        <div class="text-sm text-gray-500 mr-4 hidden md:block">
-            Status: <span class="font-bold text-blue-600">Sedia untuk hantar</span>
-        </div>
-        <button onclick="window.print()" class="w-full md:w-auto bg-gray-500 px-6 py-3 rounded-lg text-white font-bold hover:bg-gray-600 transition flex justify-center items-center gap-2">
-            🖨️ Cetak PDF
-        </button>
-        <button onclick="saveToCloud()" class="w-full md:w-auto bg-green-600 px-8 py-3 rounded-lg text-white font-bold hover:bg-green-700 shadow-lg flex justify-center items-center gap-2 transform active:scale-95 transition border-b-4 border-green-800 hover:border-green-700">
-            ☁️ 2. SIMPAN KE GOOGLE SHEET
-        </button>
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t p-4 shadow-lg flex flex-col md:flex-row justify-center items-center gap-4 no-print z-50">
+        <button onclick="window.print()" class="w-full md:w-auto bg-gray-500 px-6 py-3 rounded-lg text-white font-bold hover:bg-gray-600 transition flex justify-center items-center gap-2">🖨️ Cetak PDF</button>
+        <button onclick="saveToCloud()" class="w-full md:w-auto bg-green-600 px-8 py-3 rounded-lg text-white font-bold hover:bg-green-700 shadow-lg flex justify-center items-center gap-2 border-b-4 border-green-800 hover:border-green-700">💾 SIMPAN / KEMASKINI DATA</button>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURATION
-        // ==========================================
-        // URL Web App Anda (Telah dimasukkan)
+        // URL SCRIPT ANDA
         const APP_URL = "https://script.google.com/macros/s/AKfycbxw6QshkNeGBz5105wa78sM0KfkHc5XdYDbovPT2Pvl1PDiNp7SFN3vI_7VzaKrV2S-7w/exec"; 
-
-        // ==========================================
-        // DATA HP5 (13 ITEM)
-        // ==========================================
-        const hp5Items = [
-            { t: "Tajuk Kertas Cadangan", m: 1 }, { t: "Latar Belakang & Rasional", m: 2 }, 
-            { t: "Objektif (SMART)", m: 3 }, { t: "Kumpulan Sasaran", m: 2 }, 
-            { t: "Tentatif Program", m: 3 }, { t: "Jawatankuasa Pelaksana", m: 2 },
-            { t: "Anggaran Belanjawan", m: 3 }, { t: "Implikasi Kewangan", m: 2 }, 
-            { t: "Strategi Promosi", m: 2 }, { t: "Pelan Pengurusan Risiko", m: 2 }, 
-            { t: "Penutup", m: 2 }, { t: "Format & Bahasa", m: 3 }, 
-            { t: "Kreativiti & Inovasi", m: 3 }
-        ];
-
-        // Generate HP5 Rows
+        
+        // HP5 Data
+        const hp5Items = ["Tajuk Kertas Cadangan", "Latar Belakang", "Objektif", "Sasaran", "Tentatif", "Jawatankuasa", "Belanjawan", "Implikasi", "Promosi", "Risiko", "Penutup", "Format", "Kreativiti"];
+        const hp5Max = [1,2,3,2,3,2,3,2,2,2,2,3,3];
         const hp5Body = document.getElementById('hp5_rows');
-        hp5Items.forEach((item, i) => {
-            hp5Body.innerHTML += `
-                <tr class="hover:bg-gray-50 border-b border-gray-100">
-                    <td class="border p-2 pl-6 text-gray-700 text-xs md:text-sm">${i+1}. ${item.t}</td>
-                    <td class="border p-2 text-center text-xs font-bold text-gray-400">${item.m}</td>
-                    <td class="border p-2">
-                        <input type="number" max="${item.m}" class="hp5-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0">
-                    </td>
-                </tr>`;
+        hp5Items.forEach((t, i) => {
+            hp5Body.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100"><td class="border p-2 pl-6 text-gray-700 text-xs md:text-sm">${i+1}. ${t}</td><td class="border p-2 text-center text-xs font-bold text-gray-400">${hp5Max[i]}</td><td class="border p-2"><input type="number" max="${hp5Max[i]}" class="hp5-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>`;
         });
 
-        // ==========================================
-        // FUNGSI CLOUD (DATABASE)
-        // ==========================================
-        
         // 1. Fetch Students
         function fetchStudents() {
-            showLoader(true, "Menghubungi Google Sheet...");
-            
+            showLoader(true, "Menghubungi Database...");
             fetch(APP_URL)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 const select = document.getElementById('student_select');
                 studentsData = data; 
-                
                 select.innerHTML = '<option value="">-- Pilih Nama Pelajar --</option>';
-                
-                if(data.length === 0) {
-                    alert("Senarai pelajar kosong. Sila semak tab 'DataPelajar' dalam Google Sheet anda.");
-                } else {
+                if(data.length === 0) alert("Tiada data pelajar ditemui.");
+                else {
                     data.forEach((s, i) => {
                         const opt = document.createElement('option');
                         opt.value = i;
                         opt.text = s.nama;
                         select.appendChild(opt);
                     });
-                    document.getElementById('status_msg').innerHTML = "<span class='text-green-600 font-bold'>✅ Berjaya! Sila pilih nama pelajar.</span>";
+                    document.getElementById('status_msg').innerHTML = "<span class='text-green-600 font-bold'>✅ Berjaya! Sila pilih pelajar.</span>";
                 }
             })
-            .catch(error => {
-                alert("Gagal menyambung ke Database. Sila semak internet anda.");
-                console.error(error);
-                document.getElementById('status_msg').innerHTML = "<span class='text-red-600 font-bold'>❌ Gagal Sambung.</span>";
-            })
+            .catch(e => { alert("Gagal sambung."); console.error(e); })
             .finally(() => showLoader(false));
         }
 
@@ -222,21 +143,19 @@
             if(s) {
                 document.getElementById('std_name').value = s.nama;
                 document.getElementById('std_ic').value = s.nokp;
-                let details = s.kelas || "";
-                if(s.kumpulan) details += " (Kump " + s.kumpulan + ")";
-                document.getElementById('std_class').value = details;
+                document.getElementById('std_class').value = s.kelas + (s.kumpulan ? " (Kump "+s.kumpulan+")" : "");
             }
         });
 
-        // 2. Save Data (POST)
+        // 2. Save / Update Data
         function saveToCloud() {
             const name = document.getElementById('std_name').value;
-            if(!name || name === "-") return alert("Sila 'Muat Turun Nama' dan pilih pelajar dahulu!");
+            if(!name || name === "-") return alert("Pilih pelajar dahulu!");
+            
+            const gTotal = document.getElementById('grand_total').textContent;
+            if(!confirm(`Kemaskini markah untuk:\n👤 ${name}\nJumlah: ${gTotal}%\n\nSistem akan overwrite data lama jika ada.`)) return;
 
-            const grandTotal = parseFloat(document.getElementById('grand_total').textContent);
-            if(!confirm(`Simpan markah untuk:\n👤 ${name}\n📊 Markah: ${grandTotal}%\n\nTeruskan?`)) return;
-
-            showLoader(true, "Menghantar Data ke Cloud...");
+            showLoader(true, "Mengemaskini Data...");
 
             const payload = {
                 nama: name,
@@ -255,59 +174,40 @@
                 final_grade: txt('final_grade')
             };
 
-            // Menggunakan mode 'no-cors' untuk memastikan data dihantar walaupun browser sekat response
             fetch(APP_URL, {
-                method: "POST",
-                mode: "no-cors", 
+                method: "POST", mode: "no-cors", 
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
             .then(() => {
                 showLoader(false);
-                alert("✅ DATA BERJAYA DISIMPAN!\nSila semak tab 'RekodMarkah' dalam Google Sheet anda.");
-                // Optional: Kosongkan form jika mahu
-                // location.reload();
+                alert("✅ DATA BERJAYA DIKEMASKINI!\nSusunan telah dikemaskini mengikut Abjad.");
             })
-            .catch(err => {
-                showLoader(false);
-                alert("Ralat penghantaran: " + err);
-            });
+            .catch(err => { showLoader(false); alert("Ralat: " + err); });
         }
 
-        // ==========================================
-        // UTILITY & PENGIRAAN MARKAH
-        // ==========================================
+        // Utils
         function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
         function txt(id) { return document.getElementById(id).textContent; }
         function showLoader(show, text) {
             document.getElementById('loader').style.display = show ? 'flex' : 'none';
             if(text) document.getElementById('loader_text').textContent = text;
         }
-
         function validate(el) {
             const max = parseFloat(el.getAttribute('max'));
             let v = parseFloat(el.value);
-            
-            if(v > max) { 
-                el.value = max; 
-                el.classList.add('input-error'); 
-                // alert("Maksimum markah ialah " + max);
-                setTimeout(()=>el.classList.remove('input-error'), 800); 
-            }
+            if(v > max) { el.value = max; el.classList.add('input-error'); setTimeout(()=>el.classList.remove('input-error'), 800); }
             if(v < 0) el.value = 0;
-            
             calculateAll();
         }
-
         function calculateAll() {
             const sum = c => Array.from(document.querySelectorAll('.'+c)).reduce((a,b)=>a+(parseFloat(b.value)||0),0);
-            
             const hpk1 = val('hpk1_score');
             const hp5 = sum('hp5-input');
             const hp6 = val('hp6_1') + val('hp6_2') + val('hp6_3');
             const hp8 = val('hp8_1') + val('hp8_2') + val('hp8_3');
             const hp11 = val('hp11_score');
-
+            
             document.getElementById('hp5_total').textContent = hp5;
             document.getElementById('hp6_total').textContent = hp6;
             document.getElementById('hp8_total').textContent = hp8;
@@ -323,8 +223,6 @@
             
             const ge = document.getElementById('final_grade');
             ge.textContent = g;
-            
-            // Warna Gred Dinamik
             if(total >= 80) ge.className = "border p-4 text-center font-bold text-4xl text-green-600";
             else if(total >= 50) ge.className = "border p-4 text-center font-bold text-4xl text-yellow-600";
             else ge.className = "border p-4 text-center font-bold text-4xl text-red-600";
