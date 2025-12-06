@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pemarkahan (Update Mode)</title>
+    <title>Sistem Pemarkahan (Sokongan Perpuluhan)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); z-index:999; display:none; justify-content:center; align-items:center; color:white; flex-direction:column; backdrop-filter: blur(4px); }
@@ -27,8 +27,8 @@
 
     <div class="max-w-5xl mx-auto p-4 md:p-8 bg-white my-4 md:rounded-xl md:shadow-xl relative">
         <header class="text-center border-b-2 border-gray-800 pb-4 mb-6">
-            <h1 class="text-2xl font-bold uppercase tracking-wide">Sistem Pemarkahan MPU2071 PENGURUKAN KOKURIKULUM PDPP PEPERIKSAAN FEB 2026</h1>
-            <p class="text-sm text-gray-600">Mode Kemaskini Automatik (Tiada Pendua)</p>
+            <h1 class="text-2xl font-bold uppercase tracking-wide">Sistem Pemarkahan MPU2071 PENGURUSAN KOKURIKULUM PDPP PEPERIKSAAN FEB 2026</h1>
+            <p class="text-sm text-gray-600">Versi Sokongan Perpuluhan (Contoh: 3.5)</p>
         </header>
 
         <div class="no-print mb-6 bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
@@ -61,7 +61,7 @@
             </thead>
             <tbody class="bg-white">
                 <tr class="bg-purple-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-purple-900 border-b-2 border-purple-200">HPK1: Ujian Bertulis (30%)</td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Markah Ujian</td><td class="border p-3 text-center font-bold text-gray-500">30</td><td class="border p-3"><input type="number" id="hpk1_score" max="30" class="w-full text-center font-bold text-lg outline-none input-box text-purple-700" oninput="validate(this)" placeholder="0"></td></tr>
+                <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Markah Ujian</td><td class="border p-3 text-center font-bold text-gray-500">30</td><td class="border p-3"><input type="number" step="0.01" id="hpk1_score" max="30" class="w-full text-center font-bold text-lg outline-none input-box text-purple-700" oninput="validate(this)" placeholder="0"></td></tr>
 
                 <tr class="bg-green-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-green-900 border-b-2 border-green-200">HPK2: Pembentangan (40%)</td></tr>
                 <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP5: KERTAS KERJA (30%)</td></tr>
@@ -69,20 +69,20 @@
                 <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP5</td><td class="border p-2 text-center text-gray-500">30</td><td class="border p-2 text-center text-xl text-green-700" id="hp5_total">0</td></tr>
 
                 <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP6: DINAMIKA (10%)</td></tr>
-                <tr><td class="border p-2 pl-6">Gaya Bahasa</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" id="hp6_1" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
-                <tr><td class="border p-2 pl-6">Struktur Idea</td><td class="border p-2 text-center">4</td><td class="border p-2"><input type="number" id="hp6_2" max="4" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
-                <tr><td class="border p-2 pl-6">Kerjasama</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" id="hp6_3" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">Gaya Bahasa</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" step="0.01" id="hp6_1" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">Struktur Idea</td><td class="border p-2 text-center">4</td><td class="border p-2"><input type="number" step="0.01" id="hp6_2" max="4" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">Kerjasama</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" step="0.01" id="hp6_3" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP6</td><td class="border p-2 text-center text-gray-500">10</td><td class="border p-2 text-center text-xl text-green-700" id="hp6_total">0</td></tr>
 
                 <tr class="bg-orange-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-orange-900 border-b-2 border-orange-200">HPK3: Projek (30%)</td></tr>
                 <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP8: PRAKTIKAL (20%)</td></tr>
-                <tr><td class="border p-2 pl-6">HP8.1 Perancangan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" id="hp8_1" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
-                <tr><td class="border p-2 pl-6">HP8.2 Kepimpinan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" id="hp8_2" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
-                <tr><td class="border p-2 pl-6">HP8.3 Dokumentasi</td><td class="border p-2 text-center">6</td><td class="border p-2"><input type="number" id="hp8_3" max="6" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">HP8.1 Perancangan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" step="0.01" id="hp8_1" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">HP8.2 Kepimpinan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" step="0.01" id="hp8_2" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
+                <tr><td class="border p-2 pl-6">HP8.3 Dokumentasi</td><td class="border p-2 text-center">6</td><td class="border p-2"><input type="number" step="0.01" id="hp8_3" max="6" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr class="font-bold bg-orange-50"><td class="border p-2 text-right text-orange-800">JUMLAH HP8</td><td class="border p-2 text-center text-gray-500">20</td><td class="border p-2 text-center text-xl text-orange-700" id="hp8_total">0</td></tr>
 
                 <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP11: ETIKA (10%)</td></tr>
-                <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Nilai Etika & Sikap</td><td class="border p-3 text-center font-bold text-gray-400">10</td><td class="border p-3"><input type="number" id="hp11_score" max="10" class="w-full text-center font-bold text-lg outline-none input-box text-orange-700" oninput="validate(this)" placeholder="0"></td></tr>
+                <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Nilai Etika & Sikap</td><td class="border p-3 text-center font-bold text-gray-400">10</td><td class="border p-3"><input type="number" step="0.01" id="hp11_score" max="10" class="w-full text-center font-bold text-lg outline-none input-box text-orange-700" oninput="validate(this)" placeholder="0"></td></tr>
             </tbody>
             <tfoot class="bg-gray-900 text-white print:bg-white print:text-black border-t-4 border-black">
                 <tr><td class="border p-4 text-right font-bold uppercase text-lg">Jumlah Besar</td><td class="border p-4 text-center font-bold text-gray-400">100%</td><td class="border p-4 text-center font-bold text-3xl" id="grand_total">0.0</td></tr>
@@ -102,15 +102,16 @@
     </div>
 
     <script>
-        // URL SCRIPT ANDA
         const APP_URL = "https://script.google.com/macros/s/AKfycbxw6QshkNeGBz5105wa78sM0KfkHc5XdYDbovPT2Pvl1PDiNp7SFN3vI_7VzaKrV2S-7w/exec"; 
         
         // HP5 Data
         const hp5Items = ["Tajuk Kertas Cadangan", "Latar Belakang", "Objektif", "Sasaran", "Tentatif", "Jawatankuasa", "Belanjawan", "Implikasi", "Promosi", "Risiko", "Penutup", "Format", "Kreativiti"];
         const hp5Max = [1,2,3,2,3,2,3,2,2,2,2,3,3];
         const hp5Body = document.getElementById('hp5_rows');
+        
+        // Loop HP5 juga ditambah step="0.01"
         hp5Items.forEach((t, i) => {
-            hp5Body.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100"><td class="border p-2 pl-6 text-gray-700 text-xs md:text-sm">${i+1}. ${t}</td><td class="border p-2 text-center text-xs font-bold text-gray-400">${hp5Max[i]}</td><td class="border p-2"><input type="number" max="${hp5Max[i]}" class="hp5-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>`;
+            hp5Body.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100"><td class="border p-2 pl-6 text-gray-700 text-xs md:text-sm">${i+1}. ${t}</td><td class="border p-2 text-center text-xs font-bold text-gray-400">${hp5Max[i]}</td><td class="border p-2"><input type="number" step="0.01" max="${hp5Max[i]}" class="hp5-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>`;
         });
 
         // 1. Fetch Students
@@ -187,33 +188,52 @@
         }
 
         // Utils
-        function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
+        function val(id) { 
+            let v = document.getElementById(id).value;
+            // Tukar koma kepada titik jika pengguna taip koma
+            v = v.replace(',', '.');
+            return parseFloat(v) || 0; 
+        }
         function txt(id) { return document.getElementById(id).textContent; }
         function showLoader(show, text) {
             document.getElementById('loader').style.display = show ? 'flex' : 'none';
             if(text) document.getElementById('loader_text').textContent = text;
         }
         function validate(el) {
+            // Logik validasi ditambah untuk handle koma
+            let valStr = el.value.replace(',', '.');
+            let v = parseFloat(valStr);
             const max = parseFloat(el.getAttribute('max'));
-            let v = parseFloat(el.value);
-            if(v > max) { el.value = max; el.classList.add('input-error'); setTimeout(()=>el.classList.remove('input-error'), 800); }
+            
+            if(v > max) { 
+                el.value = max; 
+                el.classList.add('input-error'); 
+                setTimeout(()=>el.classList.remove('input-error'), 800); 
+            }
             if(v < 0) el.value = 0;
+            
             calculateAll();
         }
         function calculateAll() {
-            const sum = c => Array.from(document.querySelectorAll('.'+c)).reduce((a,b)=>a+(parseFloat(b.value)||0),0);
+            // Helper function untuk handle class array dengan selamat
+            const sum = c => Array.from(document.querySelectorAll('.'+c)).reduce((a,b)=> {
+                let valStr = b.value.replace(',', '.');
+                return a + (parseFloat(valStr)||0);
+            }, 0);
+
             const hpk1 = val('hpk1_score');
             const hp5 = sum('hp5-input');
             const hp6 = val('hp6_1') + val('hp6_2') + val('hp6_3');
             const hp8 = val('hp8_1') + val('hp8_2') + val('hp8_3');
             const hp11 = val('hp11_score');
             
-            document.getElementById('hp5_total').textContent = hp5;
-            document.getElementById('hp6_total').textContent = hp6;
-            document.getElementById('hp8_total').textContent = hp8;
+            // Format 2 tempat perpuluhan (toFixed(2)) untuk ketepatan
+            document.getElementById('hp5_total').textContent = hp5.toFixed(2).replace(/\.00$/, '');
+            document.getElementById('hp6_total').textContent = hp6.toFixed(2).replace(/\.00$/, '');
+            document.getElementById('hp8_total').textContent = hp8.toFixed(2).replace(/\.00$/, '');
             
             const total = hpk1 + hp5 + hp6 + hp8 + hp11;
-            document.getElementById('grand_total').textContent = total.toFixed(1);
+            document.getElementById('grand_total').textContent = total.toFixed(2).replace(/\.00$/, '');
             
             let g = 'F';
             if(total>=90) g='A+'; else if(total>=80) g='A'; else if(total>=75) g='A-';
