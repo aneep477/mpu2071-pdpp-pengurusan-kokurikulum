@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pemarkahan (Edit Mode)</title>
+    <title>Sistem Pemarkahan (Auto Group Sync)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.85); z-index:999; display:none; justify-content:center; align-items:center; color:white; flex-direction:column; backdrop-filter: blur(5px); }
         .input-error { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c !important; }
-        .data-found-badge { background-color: #dcfce7; color: #166534; border: 1px solid #166534; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-left: 10px; display: none; }
         
+        /* Badges */
+        .badge { font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 12px; display: none; margin-left: 10px; }
+        .badge-green { background-color: #dcfce7; color: #166534; border: 1px solid #166534; }
+        .badge-blue { background-color: #dbeafe; color: #1e40af; border: 1px solid #1e40af; }
+
         @media print {
             @page { margin: 0.5cm; size: A4; }
             body { background: white !important; font-size: 11px; -webkit-print-color-adjust: exact; }
@@ -34,20 +38,19 @@
         </header>
 
         <div class="no-print mb-6 bg-blue-50 p-5 rounded-lg border border-blue-200 shadow-sm">
-            <label class="block text-xs font-bold text-blue-900 uppercase mb-2">Pilih Pelajar untuk Dinilai / Diedit</label>
+            <label class="block text-xs font-bold text-blue-900 uppercase mb-2">Pilih Pelajar</label>
             <div class="flex gap-2">
                 <select id="student_select" class="flex-1 border border-blue-300 text-base rounded px-4 py-2 outline-none font-semibold shadow-sm focus:ring-2 focus:ring-blue-500">
                     <option value="">-- Sila Tunggu Data... --</option>
                 </select>
-                <button onclick="forceRefresh()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded shadow text-sm" title="Refresh Data">
-                    🔄
-                </button>
+                <button onclick="forceRefresh()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded shadow text-sm" title="Refresh Data">🔄</button>
             </div>
-            <p class="text-xs text-gray-500 mt-2 italic">* Pelajar yang sudah ada markah akan ditandakan dengan simbol (✅) dalam senarai.</p>
         </div>
 
         <section class="mb-6 bg-gray-50 p-6 rounded-lg border border-gray-200 relative">
-            <div id="existing_data_badge" class="absolute top-4 right-4 data-found-badge">MARKAH LAMA DIJUMPAI</div>
+            <div id="existing_data_badge" class="absolute top-4 right-4 badge badge-green">MARKAH LAMA DIJUMPAI</div>
+            <div id="group_sync_badge" class="absolute top-12 right-4 badge badge-blue">AUTOSYNC: MARKAH KUMPULAN</div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                 <div><label class="block font-bold text-xs uppercase text-gray-500 mb-1">Nama Pelajar</label><input type="text" id="std_name" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 outline-none uppercase" readonly placeholder="-"></div>
                 <div><label class="block font-bold text-xs uppercase text-gray-500 mb-1">No. KP</label><input type="text" id="std_ic" class="w-full font-bold text-lg bg-transparent border-b border-gray-300 outline-none" readonly placeholder="-"></div>
@@ -64,24 +67,28 @@
                 <tr class="bg-purple-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-purple-900 border-b-2 border-purple-200">HPK1: Ujian (30%)</td></tr>
                 <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Markah Ujian</td><td class="border p-3 text-center font-bold text-gray-500">30</td><td class="border p-3"><input type="number" step="0.01" id="hpk1_score" max="30" class="w-full text-center font-bold text-lg outline-none input-box text-purple-700" oninput="validate(this)" placeholder="0"></td></tr>
 
-                <tr class="bg-green-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-green-900 border-b-2 border-green-200">HPK2: Pembentangan (40%)</td></tr>
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP5: KERTAS KERJA (30%)</td></tr>
-                <tbody id="hp5_rows"></tbody> <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP5</td><td class="border p-2 text-center text-gray-500">30</td><td class="border p-2 text-center text-xl text-green-700" id="hp5_total">0</td></tr>
+                <tr class="bg-green-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-green-900 border-b-2 border-green-200 flex justify-between items-center">
+                    <span>HPK2: Pembentangan (40%)</span>
+                    <span class="text-[10px] bg-green-200 text-green-800 px-2 py-1 rounded no-print">Markah Berkumpulan</span>
+                </td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP5: KERTAS KERJA (30%) - MARKAH KUMPULAN</td></tr>
+                <tbody id="hp5_rows"></tbody> 
+                <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP5</td><td class="border p-2 text-center text-gray-500">30</td><td class="border p-2 text-center text-xl text-green-700" id="hp5_total">0</td></tr>
 
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP6: DINAMIKA (10%)</td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP6: DINAMIKA (10%) - INDIVIDU</td></tr>
                 <tr><td class="border p-2 pl-6">Gaya Bahasa</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" step="0.01" id="hp6_1" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr><td class="border p-2 pl-6">Struktur Idea</td><td class="border p-2 text-center">4</td><td class="border p-2"><input type="number" step="0.01" id="hp6_2" max="4" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr><td class="border p-2 pl-6">Kerjasama</td><td class="border p-2 text-center">3</td><td class="border p-2"><input type="number" step="0.01" id="hp6_3" max="3" class="hp6-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr class="font-bold bg-green-50"><td class="border p-2 text-right text-green-800">JUMLAH HP6</td><td class="border p-2 text-center text-gray-500">10</td><td class="border p-2 text-center text-xl text-green-700" id="hp6_total">0</td></tr>
 
                 <tr class="bg-orange-50 print:bg-white"><td colspan="3" class="border p-2 font-bold text-orange-900 border-b-2 border-orange-200">HPK3: Projek (30%)</td></tr>
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP8: PRAKTIKAL (20%)</td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP8: PRAKTIKAL (20%) - MARKAH KUMPULAN</td></tr>
                 <tr><td class="border p-2 pl-6">HP8.1 Perancangan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" step="0.01" id="hp8_1" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr><td class="border p-2 pl-6">HP8.2 Kepimpinan</td><td class="border p-2 text-center">7</td><td class="border p-2"><input type="number" step="0.01" id="hp8_2" max="7" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr><td class="border p-2 pl-6">HP8.3 Dokumentasi</td><td class="border p-2 text-center">6</td><td class="border p-2"><input type="number" step="0.01" id="hp8_3" max="6" class="hp8-input w-full text-center font-bold outline-none input-box" oninput="validate(this)"></td></tr>
                 <tr class="font-bold bg-orange-50"><td class="border p-2 text-right text-orange-800">JUMLAH HP8</td><td class="border p-2 text-center text-gray-500">20</td><td class="border p-2 text-center text-xl text-orange-700" id="hp8_total">0</td></tr>
 
-                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP11: ETIKA (10%)</td></tr>
+                <tr><td colspan="3" class="border p-2 bg-gray-100 text-xs font-bold text-center tracking-wider text-gray-600">HP11: ETIKA (10%) - INDIVIDU</td></tr>
                 <tr class="hover:bg-gray-50"><td class="border p-3 pl-6 font-medium">Nilai Etika & Sikap</td><td class="border p-3 text-center font-bold text-gray-400">10</td><td class="border p-3"><input type="number" step="0.01" id="hp11_score" max="10" class="w-full text-center font-bold text-lg outline-none input-box text-orange-700" oninput="validate(this)" placeholder="0"></td></tr>
             </tbody>
             <tfoot class="bg-gray-900 text-white print:bg-white print:text-black border-t-4 border-black">
@@ -90,7 +97,7 @@
             </tfoot>
         </table>
 
-         <div class="hidden print:flex mt-16 justify-around items-end">
+        <div class="hidden print:flex mt-16 justify-around items-end">
             <div class="text-center w-1/3"><p class="border-b border-black mb-2 pb-8"></p><p class="font-bold text-sm uppercase">Tandatangan Pelajar</p><p class="text-xs mt-1">Tarikh: ..............................</p></div>
             <div class="text-center w-1/3"><p class="border-b border-black mb-2 pb-8"></p><p class="font-bold text-sm uppercase">Tandatangan Penilai</p><p class="text-xs mt-1">Tarikh: ..............................</p></div>
         </div>
@@ -104,26 +111,24 @@
     <script>
         const APP_URL = "https://script.google.com/macros/s/AKfycbxw6QshkNeGBz5105wa78sM0KfkHc5XdYDbovPT2Pvl1PDiNp7SFN3vI_7VzaKrV2S-7w/exec"; 
         
-        // --- 1. SETUP HP5 (GENERATE ROWS) ---
+        // HP5 Rows
         const hp5Items = ["Tajuk Kertas Cadangan", "Latar Belakang", "Objektif", "Sasaran", "Tentatif", "Jawatankuasa", "Belanjawan", "Implikasi", "Promosi", "Risiko", "Penutup", "Format", "Kreativiti"];
         const hp5Max = [1,2,3,2,3,2,3,2,2,2,2,3,3];
         const hp5Body = document.getElementById('hp5_rows');
         hp5Items.forEach((t, i) => {
-            hp5Body.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100"><td class="border p-2 pl-6 text-gray-700 text-xs md:text-sm">${i+1}. ${t}</td><td class="border p-2 text-center text-xs font-bold text-gray-400">${hp5Max[i]}</td><td class="border p-2"><input type="number" step="0.01" max="${hp5Max[i]}" class="hp5-input w-full text-center font-bold outline-none input-box" oninput="validate(this)" placeholder="0"></td></tr>`;
+            hp5Body.innerHTML += `<tr class="hover:bg-gray-50 border-b border-gray-100"><td class="border p-2 pl-6 text-gray-700 text-xs md:text-sm">${i+1}. ${t}</td><td class="border p-2 text-center text-xs font-bold text-gray-400">${hp5Max[i]}</td><td class="border p-2"><input type="number" step="0.01" max="${hp5Max[i]}" class="hp5-input w-full text-center font-bold outline-none input-box group-score" oninput="validate(this)" placeholder="0"></td></tr>`;
         });
 
-        // --- 2. LOGIC LOAD DATA ---
+        // --- FETCH LOGIC ---
         let studentsData = [];
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Cek Cache dulu
-            const cached = localStorage.getItem('pelajar_data_v2');
+            const cached = localStorage.getItem('pelajar_data_v3');
             if (cached) {
-                console.log("Load from cache");
                 studentsData = JSON.parse(cached);
                 populateDropdown(studentsData);
                 document.getElementById('sync_status').innerHTML = "<span class='text-green-600'>Sedia (Tempatan)</span>";
-                fetchStudents(true); // Silent update background
+                fetchStudents(true); 
             } else {
                 fetchStudents(false);
             }
@@ -131,27 +136,23 @@
 
         function fetchStudents(isSilent = false) {
             if(!isSilent) showLoader(true, "Menarik Data Terkini...");
-            
             fetch(APP_URL)
             .then(res => res.json())
             .then(data => {
                 if(data.length > 0) {
                     studentsData = data;
-                    localStorage.setItem('pelajar_data_v2', JSON.stringify(data));
+                    localStorage.setItem('pelajar_data_v3', JSON.stringify(data));
                     populateDropdown(data);
                     document.getElementById('sync_status').innerHTML = "<span class='text-green-600'>Sedia (Online)</span>";
                 }
             })
-            .catch(e => {
-                console.error(e);
-                if(!studentsData.length) document.getElementById('sync_status').innerHTML = "<span class='text-red-600'>Gagal Sambung</span>";
-            })
+            .catch(e => { console.error(e); })
             .finally(() => showLoader(false));
         }
 
         function forceRefresh() {
-            if(confirm("Tarik semula semua data dari Google Sheet?")) {
-                localStorage.removeItem('pelajar_data_v2');
+            if(confirm("Tarik semula semua data?")) {
+                localStorage.removeItem('pelajar_data_v3');
                 fetchStudents(false);
             }
         }
@@ -160,74 +161,85 @@
             const select = document.getElementById('student_select');
             const current = select.value;
             select.innerHTML = '<option value="">-- Sila Pilih Pelajar --</option>';
-            
             data.forEach((s, i) => {
                 const opt = document.createElement('option');
                 opt.value = i;
-                // Tambah tanda ✅ jika pelajar ada 'saved_data'
                 const mark = s.saved_data ? " ✅" : "";
                 opt.text = s.nama + mark;
                 select.appendChild(opt);
             });
-            
             if(current && data[current]) select.value = current;
         }
 
-        // --- 3. AUTO-FILL FORM BILA PILIH NAMA ---
+        // --- NEW: LOGIC AUTO-FILL MARKAH KUMPULAN ---
         document.getElementById('student_select').addEventListener('change', function() {
             const index = this.value;
-            if (index === "") {
-                resetForm();
-                return;
-            }
+            if (index === "") { resetForm(); return; }
 
             const s = studentsData[index];
             document.getElementById('std_name').value = s.nama;
             document.getElementById('std_ic').value = s.nokp;
             document.getElementById('std_class').value = s.kelas + (s.kumpulan ? " (Kump "+s.kumpulan+")" : "");
             
-            // CEK JIKA ADA MARKAH LAMA
+            // RESET BADGES
+            document.getElementById('existing_data_badge').style.display = 'none';
+            document.getElementById('group_sync_badge').style.display = 'none';
+            clearScores();
+
+            // 1. JIKA PELAJAR INI ADA MARKAH SENDIRI (PRIORITY UTAMA)
             if (s.saved_data) {
-                // PAPARKAN MARKAH
                 document.getElementById('existing_data_badge').style.display = 'block';
-                
-                // Isi HPK1
-                setVal('hpk1_score', s.saved_data.hpk1);
-                
-                // Isi HP5 (Array)
-                const hp5Inputs = document.querySelectorAll('.hp5-input');
-                s.saved_data.hp5_detail.forEach((val, idx) => {
-                    if(hp5Inputs[idx]) hp5Inputs[idx].value = val;
-                });
+                fillScores(s.saved_data);
+            } 
+            // 2. JIKA TIADA MARKAH, CARI MARKAH KAWAN SEKUMPULAN (HP5 SAHAJA)
+            else {
+                // Cari kawan dalam Kelas sama & Kumpulan sama yang ADA saved_data
+                const groupMate = studentsData.find(peer => 
+                    peer.kelas === s.kelas && 
+                    peer.kumpulan === s.kumpulan && 
+                    peer.saved_data
+                );
 
-                // Isi HP6 (Array 3 item)
-                setVal('hp6_1', s.saved_data.hp6_detail[0]);
-                setVal('hp6_2', s.saved_data.hp6_detail[1]);
-                setVal('hp6_3', s.saved_data.hp6_detail[2]);
+                if (groupMate) {
+                    // Jumpa Kawan! Salin HP5 dia.
+                    document.getElementById('group_sync_badge').style.display = 'block';
+                    // Isi HP5 (Array)
+                    const hp5Inputs = document.querySelectorAll('.hp5-input');
+                    groupMate.saved_data.hp5_detail.forEach((val, idx) => {
+                        if(hp5Inputs[idx]) hp5Inputs[idx].value = val;
+                    });
+                    
+                    // Isi HP8 (Array 3 item) juga jika ia dianggap markah kumpulan
+                    // Dalam kes ini, saya buat HP8 juga auto-fill sebab selalunya projek pun kumpulan
+                    setVal('hp8_1', groupMate.saved_data.hp8_detail[0]);
+                    setVal('hp8_2', groupMate.saved_data.hp8_detail[1]);
+                    setVal('hp8_3', groupMate.saved_data.hp8_detail[2]);
 
-                // Isi HP8 (Array 3 item)
-                setVal('hp8_1', s.saved_data.hp8_detail[0]);
-                setVal('hp8_2', s.saved_data.hp8_detail[1]);
-                setVal('hp8_3', s.saved_data.hp8_detail[2]);
-
-                // Isi HP11
-                setVal('hp11_score', s.saved_data.hp11);
-
-                // Kira semula total
-                calculateAll();
-
-            } else {
-                // TIADA MARKAH, RESET FORM
-                document.getElementById('existing_data_badge').style.display = 'none';
-                clearScores();
+                    calculateAll();
+                    alert(`💡 Markah Berkumpulan (HP5 & HP8) telah disalin secara automatik daripada ahli kumpulan: \n${groupMate.nama}`);
+                }
             }
         });
 
-        // --- 4. SAVING LOGIC ---
+        // Helper untuk isi semua markah (kes 1)
+        function fillScores(data) {
+            setVal('hpk1_score', data.hpk1);
+            const hp5Inputs = document.querySelectorAll('.hp5-input');
+            data.hp5_detail.forEach((val, idx) => { if(hp5Inputs[idx]) hp5Inputs[idx].value = val; });
+            setVal('hp6_1', data.hp6_detail[0]);
+            setVal('hp6_2', data.hp6_detail[1]);
+            setVal('hp6_3', data.hp6_detail[2]);
+            setVal('hp8_1', data.hp8_detail[0]);
+            setVal('hp8_2', data.hp8_detail[1]);
+            setVal('hp8_3', data.hp8_detail[2]);
+            setVal('hp11_score', data.hp11);
+            calculateAll();
+        }
+
+        // --- SAVING LOGIC ---
         function saveToCloud() {
             const name = document.getElementById('std_name').value;
             if(!name || name === "-") return alert("Pilih pelajar dahulu!");
-            
             const gTotal = document.getElementById('grand_total').textContent;
             if(!confirm(`Simpan/Kemaskini markah untuk:\n👤 ${name}\nJumlah: ${gTotal}%\n\nData lama akan diganti.`)) return;
 
@@ -258,8 +270,7 @@
             .then(() => {
                 showLoader(false);
                 alert("✅ DATA BERJAYA DISIMPAN!");
-                // Refresh data background untuk update tanda ✅
-                localStorage.removeItem('pelajar_data_v2');
+                localStorage.removeItem('pelajar_data_v3');
                 fetchStudents(true);
             })
             .catch(err => { showLoader(false); alert("Ralat: " + err); });
@@ -270,23 +281,9 @@
         function val(id) { return parseFloat(document.getElementById(id).value.replace(',','.')) || 0; }
         function valRaw(el) { return parseFloat(el.value.replace(',','.')) || 0; }
         function txt(id) { return document.getElementById(id).textContent; }
-        
-        function clearScores() {
-            document.querySelectorAll('input[type=number]').forEach(i => i.value = '');
-            calculateAll();
-        }
-        function resetForm() {
-            document.getElementById('std_name').value = "";
-            document.getElementById('std_ic').value = "";
-            document.getElementById('std_class').value = "";
-            clearScores();
-        }
-
-        function showLoader(show, text) {
-            document.getElementById('loader').style.display = show ? 'flex' : 'none';
-            if(text) document.getElementById('loader_text').textContent = text;
-        }
-
+        function clearScores() { document.querySelectorAll('input[type=number]').forEach(i => i.value = ''); calculateAll(); }
+        function resetForm() { document.getElementById('std_name').value = ""; clearScores(); document.getElementById('existing_data_badge').style.display='none'; document.getElementById('group_sync_badge').style.display='none'; }
+        function showLoader(show, text) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; if(text) document.getElementById('loader_text').textContent = text; }
         function validate(el) {
             let v = parseFloat(el.value.replace(',','.'));
             const max = parseFloat(el.getAttribute('max'));
@@ -294,10 +291,8 @@
             if(v < 0) el.value = 0;
             calculateAll();
         }
-
         function calculateAll() {
             const sum = c => Array.from(document.querySelectorAll('.'+c)).reduce((a,b)=> a + (parseFloat(b.value.replace(',','.'))||0), 0);
-
             const hpk1 = val('hpk1_score');
             const hp5 = sum('hp5-input');
             const hp6 = val('hp6_1') + val('hp6_2') + val('hp6_3');
@@ -307,21 +302,11 @@
             document.getElementById('hp5_total').textContent = hp5.toFixed(2).replace(/\.00$/, '');
             document.getElementById('hp6_total').textContent = hp6.toFixed(2).replace(/\.00$/, '');
             document.getElementById('hp8_total').textContent = hp8.toFixed(2).replace(/\.00$/, '');
-            
             const total = hpk1 + hp5 + hp6 + hp8 + hp11;
             document.getElementById('grand_total').textContent = total.toFixed(2).replace(/\.00$/, '');
-            
-            let g = 'F';
-            if(total>=90) g='A+'; else if(total>=80) g='A'; else if(total>=75) g='A-';
-            else if(total>=70) g='B+'; else if(total>=65) g='B'; else if(total>=60) g='B-';
-            else if(total>=55) g='C+'; else if(total>=50) g='C'; else if(total>=45) g='C-';
-            else if(total>=40) g='D+'; else if(total>=35) g='D';
-            
-            const ge = document.getElementById('final_grade');
-            ge.textContent = g;
-            if(total >= 80) ge.className = "border p-4 text-center font-bold text-4xl text-green-600";
-            else if(total >= 50) ge.className = "border p-4 text-center font-bold text-4xl text-yellow-600";
-            else ge.className = "border p-4 text-center font-bold text-4xl text-red-600";
+            let g = 'F'; if(total>=90) g='A+'; else if(total>=80) g='A'; else if(total>=75) g='A-'; else if(total>=70) g='B+'; else if(total>=65) g='B'; else if(total>=60) g='B-'; else if(total>=55) g='C+'; else if(total>=50) g='C'; else if(total>=45) g='C-'; else if(total>=40) g='D+'; else if(total>=35) g='D';
+            const ge = document.getElementById('final_grade'); ge.textContent = g;
+            if(total >= 80) ge.className = "border p-4 text-center font-bold text-4xl text-green-600"; else if(total >= 50) ge.className = "border p-4 text-center font-bold text-4xl text-yellow-600"; else ge.className = "border p-4 text-center font-bold text-4xl text-red-600";
         }
     </script>
 </body>
